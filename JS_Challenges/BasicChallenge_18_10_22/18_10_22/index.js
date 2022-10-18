@@ -15,3 +15,4 @@ const markHigherBMI =
   Math.round(bmi(Mark.height, Mark.mass)) >
   Math.round(bmi(John.height, John.mass));
 console.log(markHigherBMI);
+//////////////// Next challenge/////////////////////
