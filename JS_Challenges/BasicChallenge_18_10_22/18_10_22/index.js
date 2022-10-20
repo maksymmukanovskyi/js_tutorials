@@ -49,6 +49,14 @@ const tipCalculator = function (cost) {
   return cost + tip;
 };
 
+let result = [];
+
+const price = [22, 295, 176, 440, 37, 105, 10, 1100, 86, 52];
+for (let i = 0; i < price.length; i++) {
+  result.push(tipCalculator(price[i]));
+}
+console.log(result);
+
 console.log([275, 40, 430].reduce((acc, el) => acc + tipCalculator(el), 0));
 
 ////////////////////////////////////////////////////////////
@@ -74,3 +82,5 @@ function bmiLevels(...args) {
 const bmiRange = bmiLevels(mark, john);
 const message = `${bmiRange[0].name} BMI (${bmiRange[0].bmi}) is higher than ${bmiRange[1].name} BMI (${bmiRange[1].bmi})!`;
 console.log(message);
+
+//////////////////////////////////////////////////////////////////////////////
