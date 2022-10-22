@@ -48,10 +48,33 @@ const game = {
   };
   console.log(...newArr);
   */
- let newArr = [];
+ /*let newArr = [];
  for(const [key, value] of Object.entries(game.odds)){
     newArr.push(value);
  }
  const average = Math.trunc(newArr.reduce((acc, el) => acc + el, 0)/newArr.length);
 
- console.log(average);
+ console.log(average);*/
+
+ /* Odd of victory Bayern Munich: 1.33
+      Odd of draw: 3.25
+      Odd of victory Borrussia Dortmund: 6.5*/
+
+
+/*const message = [];
+ for(const [key, value] of Object.entries(game.odds)){
+    message.push(`Odd of victory ${game[key] ||= 'Draw'}: ${value}`);
+ };
+ console.log(...message);*/
+
+ const scores = game.scored.reduce((acc, el) => {
+    let counter = 1;
+    acc[el] = acc[el]? counter+1: 1;
+    return acc;
+ }, {});
+ console.log(scores);
+
+
+
+
+
