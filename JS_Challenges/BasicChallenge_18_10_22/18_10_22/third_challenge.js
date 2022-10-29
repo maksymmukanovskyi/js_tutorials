@@ -127,3 +127,39 @@ for (const [key, value] of gameEvents) {
 
   console.log(message);
 }
+
+//////////////////Strings ////////////////////////////
+const text = document.querySelector('input[type=text]');
+const button = document.querySelector('input[type=SUBMIT]');
+
+button.addEventListener('click', onClickBtn);
+function onClickBtn(e) {
+  e.preventDefault();
+  const insertedText = text.value;
+  const convertedText = insertedText
+    .split(' ')
+    .filter(el => el.length > 1)
+    .map(el => el.toLowerCase())
+    .map(el => el.split('_'))
+    .reduce(
+      (acc, el) => {
+        const processed = acc.concat(
+          el[0] + el[1].replace(el[1][0], el[1][0].toUpperCase())
+        );
+
+        return processed;
+      },
+
+      []
+    );
+
+  const result = [];
+  let acc = '✅';
+
+  for (let el of convertedText) {
+    result.push(el.concat(' ', acc));
+    acc += ' ✅';
+  }
+  console.log(...result);
+  text.value = '';
+}

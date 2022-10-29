@@ -1,12 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
-  <script src="./third_challenge.js"></script>
-</body>
-</html> 
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      form {
+        display: flex;
+        width: 50%;
+      }
+      body {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+
+        margin: auto;
+        margin-top: 150px;
+        background: linear-gradient(to top left, #28b487, #7dd56f);
+      }
+
+      body {
+        flex-direction: column;
+      }
+      h3 {
+        display: block;
+        font-family: sans-serif;
+        font-size: 50px;
+        line-height: 1.3;
+        width: 100%;
+        padding: 30px;
+        text-align: center;
+        color: white;
+      }
+
+      input[type='TEXT'] {
+        width: 300px;
+        height: 100px;
+      }
+      input[type='SUBMIT'] {
+        width: 80px;
+        height: 50px;
+        margin: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <form name="myForm">
+      <input type="TEXT" value="" name="myText" />
+      <input type="SUBMIT" value="Submit" name="mySubmit" />
+    </form>
+    <h3>SObniu</h3>
+    <script src="./third_challenge.js"></script>
+  </body>
+</html>
