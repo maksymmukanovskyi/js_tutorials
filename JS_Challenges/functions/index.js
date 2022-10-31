@@ -49,4 +49,46 @@ poll.displayResults.call({answers: [5, 2, 3]}, 'string');
 poll.displayResults.call({answers: [1, 5, 3, 9, 6, 1]});
 poll.displayResults.call({answers: [1, 5, 3, 9, 6, 1]}, 'string');
 
+let list;
+{
+  list = [25,24];
+}
+console.log(list);
+
+let f;
+
+const g = function(){
+  const a = 23;
+  f = function(){
+    console.log(a*2);
+  }
+};
+
+
+
+
+
+
+
+
+
+const h = function(){
+  const b = 50;
+  f = function(){
+    console.log(b*2);
+  }
+};
+
+
+h();
+f();
+
+g();
+f();
+
+(function () {
+  const header = document.querySelector('h1');
+  header.style.color = 'red';
+  document.querySelector('body').addEventListener('click', () => header.style.color = 'blue');
+})();
 
