@@ -112,6 +112,23 @@ const calcPrintalance = function (movs) {
 
 calcPrintalance(account1.movements);
 
+const calcDisplaySummary = function (mov) {
+  const income = mov.filter(el => el > 0).reduce((acc, el) => acc + el, 0);
+  labelSumIn.textContent = `${income} €`;
+
+  const expence = mov.filter(el => el < 0).reduce((acc, el) => acc + el, 0);
+  labelSumOut.textContent = `${Math.abs(expence)} €`;
+
+  const interest = mov
+    .filter(el => el > 0)
+    .reduce((acc, el) => {
+      let elInterest = (el * account1.interestRate) / 100;
+      return elInterest > 1 ? acc + elInterest : acc + 0;
+    }, 0);
+  labelSumInterest.textContent = `${Math.abs(interest)} €`;
+};
+
+calcDisplaySummary(account1.movements);
 /* 
 
 //////////////challenge #1
@@ -187,3 +204,14 @@ console.log(calcAverageHumanAge([16, 6, 10, 5, 6, 1, 4]));
 
 
 */
+
+const calcAverageHumanAge = ages =>
+  Math.trunc(
+    ages
+      .map(el => (el <= 2 ? el * 2 : 16 + el * 4))
+      .filter(el => el > 18)
+      .reduce((acc, el, i, arr) => acc + el / arr.length, 0)
+  );
+
+console.log(calcAverageHumanAge([5, 2, 4, 1, 15, 8, 3]));
+console.log(calcAverageHumanAge([16, 6, 10, 5, 6, 1, 4]));
