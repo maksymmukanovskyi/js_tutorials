@@ -75,9 +75,9 @@ const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 //////////////////////////PROJECT BUILD/////////////////
 
-const displayMovements = function (movements) {
+const displayMovements = function (acc) {
   containerMovements.innerHTML = '';
-  movements.forEach((el, i) => {
+  acc.movements.forEach((el, i) => {
     const type = el > 0 ? 'deposit' : 'withdrawal';
     const html = `<div class="movements__row">
     <div class="movements__type movements__type--${type}">${
@@ -91,8 +91,6 @@ const displayMovements = function (movements) {
   });
 };
 
-displayMovements(account1.movements);
-
 const createUserName = function (accts) {
   accts.forEach(
     acc =>
@@ -105,30 +103,122 @@ const createUserName = function (accts) {
 };
 createUserName(accounts);
 
-const calcPrintalance = function (movs) {
-  const balance = movs.reduce((acc, el) => (acc += el), 0);
-  labelBalance.textContent = `${balance} EUR`;
+const calcPrintBalance = function (account) {
+  account.balance = account.movements.reduce((acc, el) => (acc += el), 0);
+  labelBalance.textContent = `${account.balance} EUR`;
 };
 
-calcPrintalance(account1.movements);
-
-const calcDisplaySummary = function (mov) {
-  const income = mov.filter(el => el > 0).reduce((acc, el) => acc + el, 0);
+const calcDisplaySummary = function (acc) {
+  const income = acc.movements
+    .filter(el => el > 0)
+    .reduce((acc, el) => acc + el, 0);
   labelSumIn.textContent = `${income} €`;
 
-  const expence = mov.filter(el => el < 0).reduce((acc, el) => acc + el, 0);
+  const expence = acc.movements
+    .filter(el => el < 0)
+    .reduce((acc, el) => acc + el, 0);
   labelSumOut.textContent = `${Math.abs(expence)} €`;
 
-  const interest = mov
+  const interest = acc.movements
     .filter(el => el > 0)
-    .reduce((acc, el) => {
-      let elInterest = (el * account1.interestRate) / 100;
-      return elInterest > 1 ? acc + elInterest : acc + 0;
+    .reduce((accum, el) => {
+      let elInterest = (el * acc.interestRate) / 100;
+      return elInterest > 1 ? accum + elInterest : accum + 0;
     }, 0);
-  labelSumInterest.textContent = `${Math.abs(interest)} €`;
+  labelSumInterest.textContent = `${Math.abs(Math.trunc(interest))} €`;
 };
 
-calcDisplaySummary(account1.movements);
+let currentAccount;
+
+const updateAccount = function (account) {
+  displayMovements(account);
+  calcPrintBalance(account);
+  calcDisplaySummary(account);
+};
+
+btnLogin.addEventListener('click', e => {
+  e.preventDefault();
+  currentAccount = accounts.find(
+    el => el.username === inputLoginUsername.value
+  );
+  console.log(currentAccount);
+
+  if (currentAccount?.pin === +inputLoginPin.value) {
+    //display UI
+    labelWelcome.textContent = `Welcome back, ${
+      currentAccount.owner.split(' ')[0]
+    }`;
+    containerApp.style.opacity = 100;
+
+    //clear input fields
+
+    inputLoginUsername.value = inputLoginPin.value = '';
+    inputLoginPin.blur();
+
+    //display movements
+    //display balance
+    //display summary
+    updateAccount(currentAccount);
+  }
+});
+
+// transfers
+
+btnTransfer.addEventListener('click', e => {
+  e.preventDefault();
+  const amount = +inputTransferAmount.value;
+  const receiverAccount = accounts.find(
+    el => el.username === inputTransferTo.value
+  );
+  inputTransferAmount.value = inputTransferTo.value = '';
+
+  if (
+    amount > 0 &&
+    receiverAccount &&
+    currentAccount.balance >= amount &&
+    receiverAccount?.username !== currentAccount.username
+  ) {
+    //doing the transfer
+    currentAccount.movements.push(-amount);
+    receiverAccount.movements.push(amount);
+    updateAccount(currentAccount);
+  }
+});
+
+// Loan Request
+
+btnLoan.addEventListener('click', e => {
+  e.preventDefault();
+  const amount = +inputLoanAmount.value;
+  if (amount > 0 && currentAccount.movements.some(el => el >= amount * 0.1)) {
+    //add movement
+    currentAccount.movements.push(amount);
+    //update UI
+    updateAccount(currentAccount);
+  }
+  inputLoanAmount.value = '';
+});
+
+// CLOSE ACCOUNT///////
+
+btnClose.addEventListener('click', e => {
+  e.preventDefault();
+  if (
+    inputCloseUsername?.value === currentAccount.username &&
+    +inputClosePin?.value === currentAccount.pin
+  ) {
+    let index = accounts.findIndex(
+      acc => acc.username === currentAccount.username
+    );
+    accounts.splice(index, 1);
+    containerApp.style.opacity = 0;
+
+    console.log(accounts);
+  }
+  inputCloseUsername.value = inputClosePin.value = '';
+  inputClosePin.blur();
+});
+
 /* 
 
 //////////////challenge #1
@@ -203,7 +293,7 @@ console.log(calcAverageHumanAge([16, 6, 10, 5, 6, 1, 4]));
 //////////////challenge #3
 
 
-*/
+
 
 const calcAverageHumanAge = ages =>
   Math.trunc(
@@ -215,3 +305,4 @@ const calcAverageHumanAge = ages =>
 
 console.log(calcAverageHumanAge([5, 2, 4, 1, 15, 8, 3]));
 console.log(calcAverageHumanAge([16, 6, 10, 5, 6, 1, 4]));
+*/
