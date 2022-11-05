@@ -75,9 +75,14 @@ const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 //////////////////////////PROJECT BUILD/////////////////
 
-const displayMovements = function (acc) {
+const displayMovements = function (acc, sort = false) {
   containerMovements.innerHTML = '';
-  acc.movements.forEach((el, i) => {
+
+  const movs = sort
+    ? acc.movements.slice().sort((a, b) => a - b)
+    : acc.movements;
+
+  movs.forEach((el, i) => {
     const type = el > 0 ? 'deposit' : 'withdrawal';
     const html = `<div class="movements__row">
     <div class="movements__type movements__type--${type}">${
@@ -219,6 +224,15 @@ btnClose.addEventListener('click', e => {
   inputClosePin.blur();
 });
 
+let sorted = false;
+
+btnSort.addEventListener('click', e => {
+  e.preventDefault();
+  console.log('sort pressed');
+  displayMovements(currentAccount, !sorted);
+  sorted = !sorted;
+});
+
 /* 
 
 //////////////challenge #1
@@ -327,7 +341,7 @@ HINT 1: Use many different tools to solve these challenges, you can use the summ
 HINT 2: Being within a range 10% above and below the recommended portion means: current > (recommended * 0.90) && current < (recommended * 1.10). Basically, the current portion should be between 90% and 110% of the recommended portion.
 TEST DATA:
 GOOD LUCK 😀
-*/
+
 const dogs = [
   { weight: 22, curFood: 250, owners: ['Alice', 'Bob'] },
   { weight: 8, curFood: 200, owners: ['Matilda'] },
@@ -406,4 +420,19 @@ console.log(
 const shallowCopy = [...dogs];
 console.log(shallowCopy.sort((a, b) => a.recomendedFood - b.recomendedFood));
 
-/*                              DONE                                */
+
+const randomDice = Array.from({ length: 100 }, (_, i) =>
+  Math.round(Math.random() * 100)
+);
+console.log(randomDice);
+
+labelBalance.addEventListener('click', () => {
+  const movementUI = Array.from(
+    document.querySelectorAll('.movements__value'),
+    el => +el.textContent.replace('€', '')
+  );
+
+  console.log(movementUI);
+});
+
+                             DONE                                */
