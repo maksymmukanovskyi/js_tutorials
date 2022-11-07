@@ -85,7 +85,7 @@ const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 //////////////////////////PROJECT BUILD/////////////////
 //date forming
 
-const formatMovementsDate = date => {
+const formatMovementsDate = (date, locale) => {
   const calcDayPassed = (date1, date2) =>
     Math.round(Math.abs((date2 - date1) / (1000 * 60 * 60 * 24)));
 
@@ -95,12 +95,14 @@ const formatMovementsDate = date => {
   if (daysPassed === 0) return 'Today';
   if (daysPassed === 1) return 'Yesterday';
   if (daysPassed <= 7) return `${daysPassed} days ago`;
-  else {
-    const day = `${date.getDate()}`.padStart(2, 0);
-    const month = `${date.getMonth() + 1}`.padStart(2, 0);
-    const year = `${date.getFullYear()}`;
-    return `${day}/${month}/${year}`;
-  }
+  return new Intl.DateTimeFormat(locale).format();
+};
+
+const formatCur = (value, locale, currency) => {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currency,
+  }).format(value);
 };
 
 const displayMovements = function (acc, sort = false) {
@@ -112,7 +114,7 @@ const displayMovements = function (acc, sort = false) {
 
   movs.forEach((el, i) => {
     const date = new Date(acc.movementsDates[i]);
-    const displayDate = formatMovementsDate(date);
+    const displayDate = formatMovementsDate(date, acc.locale);
 
     const type = el > 0 ? 'deposit' : 'withdrawal';
     const html = `<div class="movements__row">
@@ -120,7 +122,11 @@ const displayMovements = function (acc, sort = false) {
       i + 1
     } ${type} </div>
     <div class="movements__date">${displayDate}</div>
-    <div class="movements__value">${el.toFixed(2)}</div>
+    <div class="movements__value">${formatCur(
+      el,
+      acc.locale,
+      acc.currency
+    )}</div>
   </div>`;
 
     containerMovements.insertAdjacentHTML('afterbegin', html);
@@ -141,19 +147,27 @@ createUserName(accounts);
 
 const calcPrintBalance = function (account) {
   account.balance = account.movements.reduce((acc, el) => (acc += el), 0);
-  labelBalance.textContent = `${account.balance.toFixed(2)} EUR`;
+  labelBalance.textContent = formatCur(
+    account.balance,
+    account.locale,
+    account.currency
+  );
 };
 
 const calcDisplaySummary = function (acc) {
   const income = acc.movements
     .filter(el => el > 0)
     .reduce((acc, el) => acc + el, 0);
-  labelSumIn.textContent = `${income.toFixed(2)} €`;
+  labelSumIn.textContent = formatCur(income, acc.locale, acc.currency);
 
   const expence = acc.movements
     .filter(el => el < 0)
     .reduce((acc, el) => acc + el, 0);
-  labelSumOut.textContent = `${Math.abs(expence).toFixed(2)} €`;
+  labelSumOut.textContent = formatCur(
+    Math.abs(expence),
+    acc.locale,
+    acc.currency
+  );
 
   const interest = acc.movements
     .filter(el => el > 0)
@@ -161,9 +175,11 @@ const calcDisplaySummary = function (acc) {
       let elInterest = (el * acc.interestRate) / 100;
       return elInterest > 1 ? accum + elInterest : accum + 0;
     }, 0);
-  labelSumInterest.textContent = `${Math.abs(Math.trunc(interest)).toFixed(
-    2
-  )} €`;
+  labelSumInterest.textContent = formatCur(
+    Math.abs(Math.trunc(interest)),
+    acc.locale,
+    acc.currency
+  );
 };
 
 let currentAccount;
@@ -196,13 +212,27 @@ btnLogin.addEventListener('click', e => {
     /////////// login date
 
     const now = new Date();
-    const day = `${now.getDate()}`.padStart(2, 0);
+
+    /*const day = `${now.getDate()}`.padStart(2, 0);
     const month = `${now.getMonth() + 1}`.padStart(2, 0);
     const year = now.getFullYear();
     const hours = `${now.getHours()}`.padStart(2, 0);
     const minutes = `${now.getMinutes()}`.padStart(2, 0);
+*/
 
-    labelDate.textContent = `${day}/${month}/${year}, ${hours}:${minutes}`;
+    const options = {
+      hour: 'numeric',
+      minute: 'numeric',
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+    };
+
+    const locale = currentAccount.locale;
+
+    labelDate.textContent = new Intl.DateTimeFormat(locale, options).format(
+      now
+    );
 
     //clear input fields
 
