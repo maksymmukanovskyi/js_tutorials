@@ -182,19 +182,31 @@ const calcDisplaySummary = function (acc) {
   );
 };
 
-let currentAccount;
-
 const updateAccount = function (account) {
   displayMovements(account);
   calcPrintBalance(account);
   calcDisplaySummary(account);
 };
 
-//Fake alwways logined
+const startLogOutTimer = () => {
+  let time = 120;
+  const tick = () => {
+    const min = String(Math.trunc(time / 60)).padStart(2, 0);
+    const sec = String(time % 60).padStart(2, 0);
+    labelTimer.textContent = `${min}:${sec}`;
+    if (time === 0) {
+      clearInterval(timer);
+      labelWelcome.textContent = `Log in to get started! `;
+      containerApp.style.opacity = 0;
+    }
+    time--;
+  };
+  tick();
+  const timer = setInterval(tick, 1000);
+  return timer;
+};
 
-// currentAccount = account1;
-// updateAccount(currentAccount);
-// containerApp.style.opacity = 100;
+let currentAccount, timer;
 
 btnLogin.addEventListener('click', e => {
   e.preventDefault();
@@ -238,6 +250,8 @@ btnLogin.addEventListener('click', e => {
 
     inputLoginUsername.value = inputLoginPin.value = '';
     inputLoginPin.blur();
+    if (timer) clearInterval(timer);
+    timer = startLogOutTimer();
 
     //display movements
     //display balance
@@ -279,15 +293,17 @@ btnLoan.addEventListener('click', e => {
   e.preventDefault();
   const amount = Math.floor(inputLoanAmount.value);
   if (amount > 0 && currentAccount.movements.some(el => el >= amount * 0.1)) {
-    //add movement
-    currentAccount.movements.push(amount);
+    setTimeout(() => {
+      //add movement
+      currentAccount.movements.push(amount);
 
-    //add loan date
+      //add loan date
 
-    currentAccount.movementsDates.push(new Date().toISOString());
+      currentAccount.movementsDates.push(new Date().toISOString());
 
-    //update UI
-    updateAccount(currentAccount);
+      //update UI
+      updateAccount(currentAccount);
+    }, 5000);
   }
   inputLoanAmount.value = '';
 });
