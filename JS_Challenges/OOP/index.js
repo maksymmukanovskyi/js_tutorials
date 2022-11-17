@@ -78,7 +78,7 @@ DATA CAR 1: 'Ford' going at 120 km/h
 GOOD LUCK 😀
 */
 
-const str1 = 'BMW going at 120 km/h';
+/*const str1 = 'BMW going at 120 km/h';
 const str2 = 'Mercedes going at 95 km/h';
 
 const filterString = function (str) {
@@ -120,3 +120,73 @@ const bmw = new Car(...filterString(str1));
 const mercedes = new Car(...filterString(str2));
 bmw.speedUS = 65;
 bmw.speedUS;
+*/
+
+/* 
+1. Use a constructor function to implement an Electric Car (called EV) as a CHILD "class" of Car. Besides a make and current speed, the EV also has the current battery charge in % ('charge' property);
+2. Implement a 'chargeBattery' method which takes an argument 'chargeTo' and sets the battery charge to 'chargeTo';
+3. Implement an 'accelerate' method that will increase the car's speed by 20, and decrease the charge by 1%. Then log a message like this: 'Tesla going at 140 km/h, with a charge of 22%';
+4. Create an electric car object and experiment with calling 'accelerate', 'brake' and 'chargeBattery' (charge to 90%). Notice what happens when you 'accelerate'! HINT: Review the definiton of polymorphism 😉
+DATA CAR 1: 'Tesla' going at 120 km/h, with a charge of 23 %
+GOOD LUCK 😀
+*/
+
+const str1 = 'BMW going at 120 km/h';
+const str2 = 'Mercedes going at 95 km/h';
+const str3 = 'Tesla going at 120 km/h, with a charge of 23 %';
+
+const filterString = function (str) {
+  const result = str.split(' ');
+  return result.filter(
+    el =>
+      el.includes('B') ||
+      el.includes('1') ||
+      el.includes('M') ||
+      el.includes('9') ||
+      el.includes('2') ||
+      el.includes('T')
+  );
+};
+//CAR Class
+function Car(make, speed) {
+  this.make = make;
+  this.speed = +speed;
+}
+
+Car.prototype.accelerate = function () {
+  this.speed += 20;
+  this.charge -= 1;
+  console.log(
+    `${this.make} going at ${this.speed} km/h, with a charge of ${this.charge}%`
+  );
+};
+Car.prototype.brake = function () {
+  this.speed -= 5;
+  console.log(this.speed);
+};
+//EV Class
+
+function Ev(make, speed, charge) {
+  Car.call(this, make, speed);
+  this.charge = +charge;
+}
+
+Ev.prototype = Object.create(Car.prototype);
+Ev.prototype.constructor = Ev;
+Ev.prototype.chargeBattery = function (chargeTo) {
+  this.charge = chargeTo;
+};
+
+const tesla = new Ev(...filterString(str3));
+
+console.log(tesla);
+tesla.accelerate();
+console.log(tesla instanceof Car);
+console.log(tesla instanceof Ev);
+console.log(tesla instanceof Object);
+tesla.brake();
+console.log(tesla);
+tesla.chargeBattery(90);
+console.log(tesla);
+tesla.accelerate();
+console.log(tesla);
