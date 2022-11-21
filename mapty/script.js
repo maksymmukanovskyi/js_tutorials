@@ -15,8 +15,12 @@ class App {
   #workouts = [];
   #mapZoomLevel = 13;
   constructor() {
+    // get user position
     this._getPosition();
 
+    // get data from local storage
+    this.getLocalStorage();
+    //attach event handlers
     form.addEventListener('submit', this._newWorkout.bind(this));
 
     inputType.addEventListener('change', this._toggleElevationField);
@@ -45,7 +49,10 @@ class App {
     }).addTo(this.#map);
 
     this.#map.on('click', this._showForm.bind(this));
+
+    this.#workouts.forEach(work => this._renderWorkoutMarker(work));
   }
+
   _showForm(mapEvt) {
     this.#mapEvent = mapEvt;
     form.classList.remove('hidden');
@@ -212,6 +219,19 @@ class App {
 
   _setLocalStorage() {
     localStorage.setItem('workouts', JSON.stringify(this.#workouts));
+  }
+
+  getLocalStorage() {
+    const data = JSON.parse(localStorage.getItem('workouts'));
+    if (!data) return;
+    this.#workouts = data;
+    this.#workouts.forEach(work => this._renderWorkout(work));
+    console.log(data);
+  }
+
+  reset() {
+    localStorage.removeItem('workouts');
+    location.reload();
   }
 }
 
