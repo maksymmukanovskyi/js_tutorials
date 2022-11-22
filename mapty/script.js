@@ -14,6 +14,8 @@ class App {
   #mapEvent;
   #workouts = [];
   #mapZoomLevel = 13;
+  #toggled = false;
+
   constructor() {
     // get user position
     this._getPosition();
@@ -26,6 +28,8 @@ class App {
     inputType.addEventListener('change', this._toggleElevationField);
 
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
+
+    containerWorkouts.addEventListener('click', this._editWorkout.bind(this));
   }
   //users current position
   _getPosition() {
@@ -51,6 +55,8 @@ class App {
     this.#map.on('click', this._showForm.bind(this));
 
     this.#workouts.forEach(work => this._renderWorkoutMarker(work));
+
+    this._renderDeleteAllBtn(this.#workouts); ///////////////////////////////////
   }
 
   _showForm(mapEvt) {
@@ -58,6 +64,7 @@ class App {
     form.classList.remove('hidden');
     inputDistance.focus();
   }
+
   _hideForm() {
     //hide the form and cleaar inputs
     inputDistance.value =
@@ -120,6 +127,7 @@ class App {
 
     //render workout on map as marker
     this._renderWorkout(workout);
+    if (this.#workouts.length === 2) this._renderDeleteAllBtn(this.#workouts); ///////////////////////////////////
     //render workout on the list
 
     //render narker
@@ -155,6 +163,9 @@ class App {
   _renderWorkout(workout) {
     let html = `
     <li class="workout workout--${workout.type}" data-id="${workout.id}">
+    <button class="edit">edit</button>
+    <button class="delete">delete</button>
+
           <h2 class="workout__title">${workout.description}</h2>
           <div class="workout__details">
             <span class="workout__icon">${
@@ -198,11 +209,28 @@ class App {
     form.insertAdjacentHTML('afterend', html);
   }
 
+  _renderDeleteAllBtn(arr) {
+    const html = `<button class="delete__all">delete all</button>`;
+    const sortHtml = `
+    <label class="filter__label">Sort workouts by:</label>
+
+    <select class="filter__input" name="sort">
+      <option value="distance">distance</option>
+      <option value="time">time</option>
+    </select>`;
+    let btn;
+    if (arr.length >= 2) {
+      btn = document.querySelector('.delete__all');
+      containerWorkouts.insertAdjacentHTML('afterend', html);
+      containerWorkouts.insertAdjacentHTML('beforebegin', sortHtml);
+    }
+    if (arr.length === 0 && btn) containerWorkouts.removeChild(btn);
+  }
+
   _moveToPopup(e) {
     const workoutEl = e.target.closest('.workout');
     if (!workoutEl) return;
     const workout = this.#workouts.find(el => el.id === workoutEl.dataset.id);
-    console.log(workout);
 
     this.#map.setView(workout.coords, this.#mapZoomLevel),
       {
@@ -213,8 +241,35 @@ class App {
       };
     // using the publick interface
 
-    workout.click();
-    console.log(workout);
+    // workout.click();                                             ////////////
+  }
+
+  _editWorkout({ target }) {
+    /////////////////////////
+    if (target.className !== 'edit') return;
+    console.log(target);
+    const workoutEl = target.closest('.workout');
+    const workout = this.#workouts.find(el => el.id === workoutEl.dataset.id);
+
+    console.log(this.#toggled);
+    if (!this.toggled) {
+      this._toggleElevationField();
+      this.#toggled = true;
+    }
+    if (workout.type === 'running') inputType.value = workout.type;
+    inputType.setAttribute('disabled', '');
+
+    inputDistance.value = workout.distance;
+    inputDuration.value = workout.duration;
+    inputCadence.value = workout.cadence;
+    if (workout.type === 'cycling') inputType.value = workout.type;
+    // inputDistance.value = workout.distance;
+    // inputDuration.value = workout.duration;
+    inputElevation.value = workout.elevationGain;
+
+    console.log(inputElevation);
+
+    this._showForm(null);
   }
 
   _setLocalStorage() {
