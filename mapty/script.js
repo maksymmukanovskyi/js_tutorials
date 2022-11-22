@@ -14,7 +14,7 @@ class App {
   #mapEvent;
   #workouts = [];
   #mapZoomLevel = 13;
-  #toggled = false;
+  #toggled = true;
 
   constructor() {
     // get user position
@@ -251,23 +251,27 @@ class App {
     const workoutEl = target.closest('.workout');
     const workout = this.#workouts.find(el => el.id === workoutEl.dataset.id);
 
-    console.log(this.#toggled);
-    if (!this.toggled) {
-      this._toggleElevationField();
-      this.#toggled = true;
+    if (workout.type === 'running') {
+      inputCadence.closest('.form__row').classList.remove('form__row--hidden');
+      inputElevation.closest('.form__row').classList.add('form__row--hidden');
+
+      inputType.value = workout.type;
+      inputType.setAttribute('disabled', '');
+
+      inputDistance.value = workout.distance;
+      inputDuration.value = workout.duration;
+      inputCadence.value = workout.cadence;
+    } else if (workout.type === 'cycling') {
+      inputElevation
+        .closest('.form__row')
+        .classList.remove('form__row--hidden');
+      inputCadence.closest('.form__row').classList.add('form__row--hidden');
+      inputType.value = workout.type;
+      inputType.setAttribute('disabled', '');
+      inputDistance.value = workout.distance;
+      inputDuration.value = workout.duration;
+      inputElevation.value = workout.elevationGain;
     }
-    if (workout.type === 'running') inputType.value = workout.type;
-    inputType.setAttribute('disabled', '');
-
-    inputDistance.value = workout.distance;
-    inputDuration.value = workout.duration;
-    inputCadence.value = workout.cadence;
-    if (workout.type === 'cycling') inputType.value = workout.type;
-    // inputDistance.value = workout.distance;
-    // inputDuration.value = workout.duration;
-    inputElevation.value = workout.elevationGain;
-
-    console.log(inputElevation);
 
     this._showForm(null);
   }
