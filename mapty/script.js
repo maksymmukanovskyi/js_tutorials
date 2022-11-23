@@ -61,12 +61,17 @@ class App {
     this._renderDeleteAllBtn(this.#workouts); ///////////////////////////////////
   }
 
-  _showForm(mapEvt, coordsArr) {
-    if (mapEvt === null) {
-      this.#mapEvent = coordsArr;
-    } else {
+  _showForm(mapEvt) {
+    console.log(mapEvt);
+    if (
+      typeof mapEvt === 'object' &&
+      mapEvt !== null &&
+      !Array.isArray(mapEvt)
+    ) {
       const coords = [mapEvt.latlng.lat, mapEvt.latlng.lng];
       this.#mapEvent = coords;
+    } else {
+      this.#mapEvent = mapEvt;
     }
 
     form.classList.remove('hidden');
@@ -239,7 +244,7 @@ class App {
     const workoutEl = e.target.closest('.workout');
     if (!workoutEl) return;
     const workout = this.#workouts.find(el => el.id === workoutEl.dataset.id);
-
+    console.log('creazy', workout.coords);
     this.#map.setView(workout.coords, this.#mapZoomLevel),
       {
         animate: true,
@@ -261,7 +266,7 @@ class App {
     submitEditBtn.classList.remove('hidden');
 
     Array.from(containerWorkouts.querySelectorAll('.workout')).map(el => {
-      if (el.dataset.id !== workoutEl.dataset.id) el.classList.add('hidden');
+      if (el.dataset.id !== workoutEl.dataset.id) el.style.display = 'none';
     });
 
     const workout = this.#workouts.find(el => el.id === workoutEl.dataset.id);
@@ -287,70 +292,67 @@ class App {
       inputDuration.value = workout.duration;
       inputElevation.value = workout.elevationGain;
     }
-    console.log(workout.coords);
-    // const { lat, lng } = this.#mapEvent.latlng;
 
-    // let latlng{}
-    this._showForm(null, workout.coords);
+    this._showForm(workout.coords);
   }
 
-  // _submitNewEdit(e) {
-  //   // e.preventDefault();
-  //   if (e.target.className !== submitEditBtn.className) return;
-  //   console.log('blaaaah');
+  _submitNewEdit(e) {
+    // e.preventDefault();
+    if (e.target.className !== submitEditBtn.className) return;
+    console.log('blaaaah');
 
-  //   const validInputs = (...inputs) =>
-  //     inputs.every(inp => Number.isFinite(inp));
-  //   const allPositive = (...inputs) => inputs.every(inp => inp > 0);
+    const validInputs = (...inputs) =>
+      inputs.every(inp => Number.isFinite(inp));
+    const allPositive = (...inputs) => inputs.every(inp => inp > 0);
 
-  //   e.preventDefault();
-  //   //get data from form
-  //   const type = inputType.value;
-  //   const duration = +inputDuration.value;
-  //   const distance = +inputDistance.value;
-  //   const [lat, lng] = this.#mapEvent;
-  //   let workout;
+    e.preventDefault();
+    //get data from form
+    const type = inputType.value;
+    const duration = +inputDuration.value;
+    const distance = +inputDistance.value;
+    const [lat, lng] = this.#mapEvent;
+    let workout;
 
-  //   //if workout running create running obj
-  //   if (type === 'running') {
-  //     const cadence = +inputCadence.value;
-  //     //check if data is valid
-  //     if (
-  //       !validInputs(duration, distance, cadence) ||
-  //       !allPositive(duration, distance, cadence)
-  //     )
-  //       return alert('input has to be a positive number!');
-  //     workout = new Running(distance, duration, [lat, lng], cadence);
-  //     //add new obj to workout array
+    //if workout running create running obj
+    if (type === 'running') {
+      const cadence = +inputCadence.value;
+      //check if data is valid
+      if (
+        !validInputs(duration, distance, cadence) ||
+        !allPositive(duration, distance, cadence)
+      )
+        return alert('input has to be a positive number!');
+      workout = new Running(distance, duration, [lat, lng], cadence);
+      //add new obj to workout array
 
-  //     this.#workouts.push(workout);
-  //   }
+      this.#workouts.push(workout);
+    }
 
-  //   //if workout cycling create cycling obj
-  //   if (type === 'cycling') {
-  //     const elevation = +inputElevation.value;
-  //     if (
-  //       !validInputs(duration, distance, elevation) ||
-  //       !allPositive(duration, distance)
-  //     )
-  //       return alert('input has to be a positive number!');
-  //     workout = new Cycling(distance, duration, [lat, lng], elevation);
-  //     //add new obj to workout array
+    //if workout cycling create cycling obj
+    if (type === 'cycling') {
+      const elevation = +inputElevation.value;
+      if (
+        !validInputs(duration, distance, elevation) ||
+        !allPositive(duration, distance)
+      )
+        return alert('input has to be a positive number!');
+      workout = new Cycling(distance, duration, [lat, lng], elevation);
+      //add new obj to workout array
 
-  //     this.#workouts.push(workout);
-  //   }
+      this.#workouts.push(workout);
+    }
 
-  //   //render workout on map as marker
-  //   this._renderWorkout(workout);
-  //   if (this.#workouts.length === 2) this._renderDeleteAllBtn(this.#workouts); ///////////////////////////////////
-  //   //render workout on the list
+    //render workout on map as marker
+    this._renderWorkout(workout);
+    if (this.#workouts.length === 2) this._renderDeleteAllBtn(this.#workouts); ///////////////////////////////////
+    //render workout on the list
 
-  //   //hide form
+    //hide form
 
-  //   this._hideForm();
-  //   //set local storage to all workouts
-  //   this._setLocalStorage();
-  // }
+    this._hideForm();
+    //set local storage to all workouts
+    this._setLocalStorage();
+  }
 
   _setLocalStorage() {
     localStorage.setItem('workouts', JSON.stringify(this.#workouts));
