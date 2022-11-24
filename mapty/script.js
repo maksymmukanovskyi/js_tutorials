@@ -16,6 +16,7 @@ class App {
   #workouts = [];
   #mapZoomLevel = 13;
   underEdit = false;
+  #idUnderEdit;
 
   constructor() {
     // get user position
@@ -31,7 +32,7 @@ class App {
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
 
     containerWorkouts.addEventListener('click', this._editWorkout.bind(this));
-    // containerWorkouts.addEventListener('click', this._submitNewEdit.bind(this));
+    containerWorkouts.addEventListener('click', this._submitNewEdit.bind(this));
   }
   //users current position
   _getPosition() {
@@ -261,6 +262,7 @@ class App {
     /////////////////////////
     if (target.className !== 'edit') return;
     const workoutEl = target.closest('.workout');
+    this.#idUnderEdit = workoutEl.dataset.id;
     if (!this.underEdit) workoutEl.style.opacity = 0.5;
     this.underEdit = true;
     submitEditBtn.classList.remove('hidden');
@@ -297,20 +299,20 @@ class App {
   }
 
   _submitNewEdit(e) {
-    // e.preventDefault();
+    e.preventDefault();
+
     if (e.target.className !== submitEditBtn.className) return;
-    console.log('blaaaah');
 
     const validInputs = (...inputs) =>
       inputs.every(inp => Number.isFinite(inp));
     const allPositive = (...inputs) => inputs.every(inp => inp > 0);
 
-    e.preventDefault();
     //get data from form
     const type = inputType.value;
     const duration = +inputDuration.value;
     const distance = +inputDistance.value;
     const [lat, lng] = this.#mapEvent;
+
     let workout;
 
     //if workout running create running obj
@@ -322,10 +324,25 @@ class App {
         !allPositive(duration, distance, cadence)
       )
         return alert('input has to be a positive number!');
-      workout = new Running(distance, duration, [lat, lng], cadence);
+
+      // workout = new Running(distance, duration, [lat, lng], cadence);
       //add new obj to workout array
 
-      this.#workouts.push(workout);
+      this.#workouts.map(workEl => {
+        let workObj;
+        if (workEl.id === this.#idUnderEdit) {
+          workObj = {
+            ...workEl,
+            distance: distance,
+            duration: duration,
+            coords: [lat, lng],
+            cadence: cadence,
+          };
+        } else {
+          workObj = workEl;
+        }
+        return workObj;
+      });
     }
 
     //if workout cycling create cycling obj
@@ -342,9 +359,12 @@ class App {
       this.#workouts.push(workout);
     }
 
+    console.log('this.#workouts', this.#workouts);
+    console.log('idUnderEdit', this.#idUnderEdit);
+
     //render workout on map as marker
-    this._renderWorkout(workout);
-    if (this.#workouts.length === 2) this._renderDeleteAllBtn(this.#workouts); ///////////////////////////////////
+    //this._renderWorkout(workout);
+    //if (this.#workouts.length === 2) this._renderDeleteAllBtn(this.#workouts); ///////////////////////////////////
     //render workout on the list
 
     //hide form
