@@ -25,14 +25,14 @@ class App {
     // get data from local storage
     this.getLocalStorage();
     //attach event handlers
-    form.addEventListener('submit', this._newWorkout.bind(this));
+    form.addEventListener('keypress', this._newWorkout.bind(this));
 
     inputType.addEventListener('change', this._toggleElevationField);
 
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
 
     containerWorkouts.addEventListener('click', this._editWorkout.bind(this));
-    containerWorkouts.addEventListener('click', this._submitNewEdit.bind(this));
+    submitEditBtn.addEventListener('click', this._submitNewEdit.bind(this));
   }
   //users current position
   _getPosition() {
@@ -98,6 +98,9 @@ class App {
   }
 
   _newWorkout(e) {
+    if (e.key !== 'Enter') return;
+    console.log('kurva', e);
+
     const validInputs = (...inputs) =>
       inputs.every(inp => Number.isFinite(inp));
     const allPositive = (...inputs) => inputs.every(inp => inp > 0);
@@ -299,9 +302,11 @@ class App {
   }
 
   _submitNewEdit(e) {
+    // e.stopPropagation();
     e.preventDefault();
+    if (e.target.className !== 'submit__edit') return;
 
-    if (e.target.className !== submitEditBtn.className) return;
+    // if (e.target.className !== submitEditBtn.className) return;
 
     const validInputs = (...inputs) =>
       inputs.every(inp => Number.isFinite(inp));
@@ -328,7 +333,7 @@ class App {
       // workout = new Running(distance, duration, [lat, lng], cadence);
       //add new obj to workout array
 
-      this.#workouts.map(workEl => {
+      this.#workouts = this.#workouts.map(workEl => {
         let workObj;
         if (workEl.id === this.#idUnderEdit) {
           workObj = {
@@ -337,6 +342,7 @@ class App {
             duration: duration,
             coords: [lat, lng],
             cadence: cadence,
+            pace: duration / distance,
           };
         } else {
           workObj = workEl;
@@ -353,13 +359,26 @@ class App {
         !allPositive(duration, distance)
       )
         return alert('input has to be a positive number!');
-      workout = new Cycling(distance, duration, [lat, lng], elevation);
-      //add new obj to workout array
-
-      this.#workouts.push(workout);
+      this.#workouts = this.#workouts.map(workEl => {
+        let workObj;
+        if (workEl.id === this.#idUnderEdit) {
+          workObj = {
+            ...workEl,
+            distance: distance,
+            duration: duration,
+            coords: [lat, lng],
+            elevationGain: elevation,
+            pace: duration / distance,
+            speed: distance / (duration / 60),
+          };
+        } else {
+          workObj = workEl;
+        }
+        return workObj;
+      });
     }
-
     console.log('this.#workouts', this.#workouts);
+
     console.log('idUnderEdit', this.#idUnderEdit);
 
     //render workout on map as marker
