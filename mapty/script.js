@@ -385,25 +385,19 @@ class App {
 
     console.log('idUnderEdit', this.#idUnderEdit);
 
-    currEl.style.opacity = 1;
-    console.log([
-      ...Array.from(containerWorkouts.children).map(el =>
-        el.nodeName === 'LI' ? (el = '') : el
-      ),
-    ]);
+    // currEl.style.opacity = 1;
 
-    containerWorkouts.insertAdjacentHTML(
-      'afterbegin',
-      ...Array.from(containerWorkouts.children).map(el =>
-        el.nodeName === 'LI' ? (el = '') : el
-      )
-    );
-    // this.#workouts.forEach(work => this._renderWorkout(work));
+    // containerWorkouts.insertAdjacentHTML('afterbegin', huynya);
+    const listToRemove = Array.from(document.querySelectorAll('.workout'));
+    listToRemove.forEach(el => el.remove());
 
-    const updatedListEl = this._renderWorkout(
-      this.#workouts.find(el => el.id === this.#idUnderEdit),
-      true
-    );
+    this.#workouts.forEach(work => this._renderWorkout(work));
+    this.underEdit = false;
+
+    // const updatedListEl = this._renderWorkout(
+    //   this.#workouts.find(el => el.id === this.#idUnderEdit),
+    //   true
+    // );
 
     // Array.from(containerWorkouts.querySelectorAll('.workout')).map(
     //   el => (el.style.display = 'grid')
