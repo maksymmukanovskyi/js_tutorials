@@ -222,7 +222,6 @@ class App {
             <span class="workout__unit">m</span>
           </div>
     </li>`;
-
     form.insertAdjacentHTML('afterend', html);
   }
 
@@ -304,6 +303,11 @@ class App {
   _submitNewEdit(e) {
     // e.stopPropagation();
     e.preventDefault();
+    let currEl = Array.from(
+      containerWorkouts.querySelectorAll('.workout')
+    ).find(el => el.dataset.id === this.#idUnderEdit);
+    console.log('to open', currEl);
+
     if (e.target.className !== 'submit__edit') return;
 
     // if (e.target.className !== submitEditBtn.className) return;
@@ -381,8 +385,31 @@ class App {
 
     console.log('idUnderEdit', this.#idUnderEdit);
 
+    currEl.style.opacity = 1;
+    console.log([
+      ...Array.from(containerWorkouts.children).map(el =>
+        el.nodeName === 'LI' ? (el = '') : el
+      ),
+    ]);
+
+    containerWorkouts.insertAdjacentHTML(
+      'afterbegin',
+      ...Array.from(containerWorkouts.children).map(el =>
+        el.nodeName === 'LI' ? (el = '') : el
+      )
+    );
+    // this.#workouts.forEach(work => this._renderWorkout(work));
+
+    const updatedListEl = this._renderWorkout(
+      this.#workouts.find(el => el.id === this.#idUnderEdit),
+      true
+    );
+
+    // Array.from(containerWorkouts.querySelectorAll('.workout')).map(
+    //   el => (el.style.display = 'grid')
+    // );
+
     //render workout on map as marker
-    //this._renderWorkout(workout);
     //if (this.#workouts.length === 2) this._renderDeleteAllBtn(this.#workouts); ///////////////////////////////////
     //render workout on the list
 
