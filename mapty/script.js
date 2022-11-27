@@ -1,5 +1,5 @@
 'use strict';
-
+const sidebar = document.querySelector('.sidebar');
 const form = document.querySelector('.form');
 const containerWorkouts = document.querySelector('.workouts');
 const inputType = document.querySelector('.form__input--type');
@@ -33,6 +33,8 @@ class App {
 
     containerWorkouts.addEventListener('click', this._editWorkout.bind(this));
     submitEditBtn.addEventListener('click', this._submitNewEdit.bind(this));
+    containerWorkouts.addEventListener('click', this._deleteWorkout.bind(this));
+    sidebar.addEventListener('click', this._deleteAllWorkouts.bind(this));
   }
   //users current position
   _getPosition() {
@@ -235,12 +237,24 @@ class App {
       <option value="time">time</option>
     </select>`;
     let btn;
+
     if (arr.length >= 2) {
       btn = document.querySelector('.delete__all');
-      containerWorkouts.insertAdjacentHTML('afterend', html);
       containerWorkouts.insertAdjacentHTML('beforebegin', sortHtml);
+      containerWorkouts.insertAdjacentHTML('afterend', html);
     }
+
     if (arr.length === 0 && btn) containerWorkouts.removeChild(btn);
+  }
+
+  removeDeleteBtn(arr) {
+    const select = document.querySelector('.filter__input');
+    const deleteAll = document.querySelector('.delete__all');
+
+    if (arr.length <= 1 && deleteAll) {
+      sidebar.removeChild(deleteAll);
+      select.setAttribute('disabled', '');
+    }
   }
 
   _moveToPopup(e) {
@@ -303,10 +317,6 @@ class App {
   _submitNewEdit(e) {
     // e.stopPropagation();
     e.preventDefault();
-    let currEl = Array.from(
-      containerWorkouts.querySelectorAll('.workout')
-    ).find(el => el.dataset.id === this.#idUnderEdit);
-    console.log('to open', currEl);
 
     if (e.target.className !== 'submit__edit') return;
 
@@ -381,37 +391,44 @@ class App {
         return workObj;
       });
     }
-    console.log('this.#workouts', this.#workouts);
 
-    console.log('idUnderEdit', this.#idUnderEdit);
+    this.updateListDOM();
 
-    // currEl.style.opacity = 1;
-
-    // containerWorkouts.insertAdjacentHTML('afterbegin', huynya);
-    const listToRemove = Array.from(document.querySelectorAll('.workout'));
-    listToRemove.forEach(el => el.remove());
-
-    this.#workouts.forEach(work => this._renderWorkout(work));
     this.underEdit = false;
-
-    // const updatedListEl = this._renderWorkout(
-    //   this.#workouts.find(el => el.id === this.#idUnderEdit),
-    //   true
-    // );
-
-    // Array.from(containerWorkouts.querySelectorAll('.workout')).map(
-    //   el => (el.style.display = 'grid')
-    // );
-
-    //render workout on map as marker
-    //if (this.#workouts.length === 2) this._renderDeleteAllBtn(this.#workouts); ///////////////////////////////////
-    //render workout on the list
-
-    //hide form
 
     this._hideForm();
     //set local storage to all workouts
     this._setLocalStorage();
+  }
+
+  updateListDOM() {
+    const listToRemove = Array.from(document.querySelectorAll('.workout'));
+    listToRemove.forEach(el => el.remove());
+
+    this.#workouts.forEach(work => this._renderWorkout(work));
+  }
+
+  _deleteWorkout(e) {
+    e.preventDefault();
+
+    if (e.target.className !== 'delete') return;
+
+    const workoutEl = e.target.closest('.workout');
+    this.#workouts = this.#workouts.filter(
+      el => el.id !== workoutEl.dataset.id
+    );
+    this.updateListDOM();
+    this.removeDeleteBtn(this.#workouts);
+    this._setLocalStorage();
+  }
+
+  _deleteAllWorkouts(e) {
+    e.preventDefault();
+    if (e.target.className !== 'delete__all') return;
+    this.#workouts = [];
+    this.reset();
+    this.updateListDOM();
+    this._renderDeleteAllBtn(this.#workouts);
   }
 
   _setLocalStorage() {
