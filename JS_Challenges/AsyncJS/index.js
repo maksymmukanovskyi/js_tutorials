@@ -124,12 +124,6 @@ TEST COORDINATES 2: -33.933, 18.474
 
 
 
-const getJSON = function (url, errMsg = 'Something went wrong') {
-  return fetch(url).then(resp => {
-    if (!resp.ok) throw new Error(`${errMsg} ${resp.status}`);
-    return resp.json();
-  });
-};
 
 
 const getCountryData = function (country) {
@@ -174,3 +168,84 @@ const whereAmI = function (lat, lng) {
 
 btn.addEventListener('click', whereAmI.bind(whereAmI, -33.933, 18.474));
 */
+
+/*console.log('test start');
+setTimeout(() => console.log('0 seconds timer'), 0);
+Promise.resolve('Resolved prommise 1').then(res => console.log(res));
+Promise.resolve('Resolved promise 2').then(res => {
+  for (let i = 0; i < 10000000; i++) {}
+  console.log(res);
+});
+console.log('test end');
+*/
+
+/*const lotteryPromise = new Promise((resolve, reject) => {
+  console.log('Lottery draw is heppening...');
+  setTimeout(() => {
+    if (Math.random() >= 0.5) {
+      resolve('You win 💰');
+    } else {
+      reject(new Error('You have loose 💩'));
+    }
+  }, 2000);
+});
+
+lotteryPromise.then(resp => console.log(resp)).catch(err => console.error(err));*/
+
+const getJSON = function (url, errMsg = 'Something went wrong') {
+  return fetch(url).then(resp => {
+    if (!resp.ok) throw new Error(`${errMsg} ${resp.status}`);
+    return resp.json();
+  });
+};
+
+const getCountryData = function (country) {
+  getJSON(`https://restcountries.com/v2/name/${country}`, 'Country not found')
+    .then(resp => {
+      renderCountry(resp[0]);
+
+      const neighbour = resp[0].borders ? resp[0].borders[0] : false;
+
+      if (!neighbour) throw new Error('No neighbour found');
+
+      return getJSON(
+        `https://restcountries.com/v2/alpha/${neighbour}`,
+        'Country not found'
+      );
+    })
+    .then(data => renderCountry(data, 'neighbour'))
+    .catch(error => {
+      renderError(error.message);
+      console.log(error);
+    })
+    .finally(() => {
+      setTimeout(() => (countriesContainer.style.opacity = 1), 10000);
+    });
+};
+
+const getPostion = function () {
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+
+const whereAmI = function () {
+  getPostion()
+    .then(pos => {
+      const { latitude: lat, longitude: lng } = pos.coords;
+      return fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+    })
+
+    .then(data => {
+      if (!data.ok) throw new Error(`No location found ${data.status}`);
+      return data.json();
+    })
+    .then(data => {
+      console.log(data);
+
+      getCountryData(data.country);
+    })
+    .catch(err => console.log(err.message));
+};
+
+// btn.addEventListener('click', whereAmI);
