@@ -17,6 +17,7 @@ class App {
   #mapZoomLevel = 13;
   underEdit = false;
   #idUnderEdit;
+  #sortType;
 
   constructor() {
     // get user position
@@ -35,6 +36,7 @@ class App {
     submitEditBtn.addEventListener('click', this._submitNewEdit.bind(this));
     containerWorkouts.addEventListener('click', this._deleteWorkout.bind(this));
     sidebar.addEventListener('click', this._deleteAllWorkouts.bind(this));
+    sidebar.addEventListener('change', this._sortList.bind(this));
   }
   //users current position
   _getPosition() {
@@ -404,8 +406,24 @@ class App {
   updateListDOM() {
     const listToRemove = Array.from(document.querySelectorAll('.workout'));
     listToRemove.forEach(el => el.remove());
-
+    this._sortList('distance');
     this.#workouts.forEach(work => this._renderWorkout(work));
+  }
+
+  _sortList(e) {
+    this.#sortType = e.target.value;
+    // console.log();
+    if (type === 'distance') {
+      this.#workouts = this.#workouts.sort(
+        (work1, work2) => work1.distance - work2.distance
+      );
+    }
+
+    if (type === 'time') {
+      this.#workouts = this.#workouts.sort(
+        (work1, work2) => work1.duration - work2.duration
+      );
+    }
   }
 
   _deleteWorkout(e) {
