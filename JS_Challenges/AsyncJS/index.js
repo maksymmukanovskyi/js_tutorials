@@ -268,16 +268,43 @@ TEST DATA: Images in the img folder. Test the error handler by passing a wrong i
 GOOD LUCK 😀
 */
 
-const createImage = function (imgPath) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const imgContainer = document.querySelector('.images');
-      const image = document.createElement('img');
-      image.setAttribute('src', imgPath);
-      resolve(image.addEventListener('load', imgContainer.append(image)));
-      reject(image.addEventListener('error', imgContainer.append(image)));
-    }, 2000);
+const wait = function (seconds) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, seconds * 1000);
   });
 };
+const imgContainer = document.querySelector('.images');
 
-createImage('img/img-1.jpg');
+const createImage = function (imgPath) {
+  return new Promise((resolve, reject) => {
+    const image = document.createElement('img');
+    image.setAttribute('src', imgPath);
+
+    image.addEventListener('load', function () {
+      imgContainer.append(image);
+      resolve(image);
+    });
+    image.addEventListener('error', () => {
+      reject(new Error('upsi dypsi'));
+    });
+  });
+};
+let currentImg;
+
+createImage('img/img-1.jpg')
+  .then(resp => {
+    currentImg = resp;
+    return wait(2);
+  })
+  .then(() => {
+    currentImg.style.display = 'none';
+    return createImage('img/img-2.jpg');
+  })
+  .then(resp => {
+    currentImg = resp;
+    return wait(2);
+  })
+  .then(() => {
+    currentImg.style.display = 'none';
+  })
+  .catch(err => console.log(err));
