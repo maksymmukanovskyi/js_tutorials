@@ -163,7 +163,7 @@ class App {
 
   _renderWorkoutMarker(workout) {
     //display marker
-    L.marker(workout.coords)
+    let theMarker = L.marker(workout.coords)
       .addTo(this.#map)
       .bindPopup(
         L.popup({
@@ -178,12 +178,20 @@ class App {
         `${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'} ${workout.description}`
       )
       .openPopup();
+
+    console.log(theMarker);
+    setTimeout(() => this.#map.removeLayer(theMarker), 2000);
   }
 
   _removeWorkoutMarker(workout) {
     // this.#map.removeLayer(L.marker(workout.coords));
     // this.#map.remove(L.marker(workout.coords));
+    // console.log(L.marker(workout.coords));
+    console.log(this.#map);
     // L.marker(workout.coords).remove();
+
+    let marker = L.marker(workout.coords).addTo(this.#map);
+    marker.remove();
   }
 
   _renderWorkout(workout) {
