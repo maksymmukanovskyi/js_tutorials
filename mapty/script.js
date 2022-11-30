@@ -17,6 +17,7 @@ class App {
   #mapZoomLevel = 13;
   underEdit = false;
   #idUnderEdit;
+  #markersArray = [];
 
   constructor() {
     // get user position
@@ -60,7 +61,7 @@ class App {
 
     this.#map.on('click', this._showForm.bind(this));
 
-    this.#workouts.forEach(work => this._removeWorkoutMarker(work));
+    this.#workouts.forEach(work => this._renderWorkoutMarker(work));
 
     this._renderDeleteAllBtn(this.#workouts); ///////////////////////////////////
   }
@@ -163,7 +164,7 @@ class App {
 
   _renderWorkoutMarker(workout) {
     //display marker
-    let theMarker = L.marker(workout.coords)
+    let marker = L.marker(workout.coords)
       .addTo(this.#map)
       .bindPopup(
         L.popup({
@@ -178,20 +179,22 @@ class App {
         `${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'} ${workout.description}`
       )
       .openPopup();
+    this.#markersArray.push(marker);
+    console.log(this.#markersArray);
 
-    console.log(theMarker);
-    setTimeout(() => this.#map.removeLayer(theMarker), 2000);
+    // setTimeout(() => this.#map.removeLayer(theMarker), 2000);
   }
 
   _removeWorkoutMarker(workout) {
-    // this.#map.removeLayer(L.marker(workout.coords));
-    // this.#map.remove(L.marker(workout.coords));
-    // console.log(L.marker(workout.coords));
     console.log(this.#map);
     // L.marker(workout.coords).remove();
+    // _lastCenter
+    let currentMarker = this.#markersArray.filter(
+      el => el._latlng.lat === workout.coords[0]
+    );
 
-    let marker = L.marker(workout.coords).addTo(this.#map);
-    marker.remove();
+    // v {lat: 47.0144714, lng: 28.8238713}
+    this.#map.removeLayer(currentMarker);
   }
 
   _renderWorkout(workout) {
