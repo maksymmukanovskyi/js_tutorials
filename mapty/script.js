@@ -180,7 +180,6 @@ class App {
       )
       .openPopup();
     this.#markersArray.push(marker);
-    console.log(this.#markersArray);
 
     // setTimeout(() => this.#map.removeLayer(theMarker), 2000);
   }
@@ -194,7 +193,7 @@ class App {
     );
 
     // v {lat: 47.0144714, lng: 28.8238713}
-    this.#map.removeLayer(currentMarker);
+    this.#map.removeLayer(currentMarker[0]);
   }
 
   _renderWorkout(workout) {
