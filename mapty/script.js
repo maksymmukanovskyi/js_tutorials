@@ -17,7 +17,6 @@ class App {
   #mapZoomLevel = 13;
   underEdit = false;
   #idUnderEdit;
-  #sortType;
 
   constructor() {
     // get user position
@@ -61,7 +60,7 @@ class App {
 
     this.#map.on('click', this._showForm.bind(this));
 
-    this.#workouts.forEach(work => this._renderWorkoutMarker(work));
+    this.#workouts.forEach(work => this._removeWorkoutMarker(work));
 
     this._renderDeleteAllBtn(this.#workouts); ///////////////////////////////////
   }
@@ -181,6 +180,12 @@ class App {
       .openPopup();
   }
 
+  _removeWorkoutMarker(workout) {
+    // this.#map.removeLayer(L.marker(workout.coords));
+    // this.#map.remove(L.marker(workout.coords));
+    // L.marker(workout.coords).remove();
+  }
+
   _renderWorkout(workout) {
     let html = `
     <li class="workout workout--${workout.type}" data-id="${workout.id}">
@@ -235,6 +240,7 @@ class App {
     <label class="filter__label">Sort workouts by:</label>
 
     <select class="filter__input" name="sort">
+    <option value="">Sort Workouts by:</option>
       <option value="distance">distance</option>
       <option value="time">time</option>
     </select>`;
@@ -406,13 +412,13 @@ class App {
   updateListDOM() {
     const listToRemove = Array.from(document.querySelectorAll('.workout'));
     listToRemove.forEach(el => el.remove());
-    this._sortList('distance');
     this.#workouts.forEach(work => this._renderWorkout(work));
   }
 
   _sortList(e) {
-    this.#sortType = e.target.value;
-    // console.log();
+    if (e.target.value === '') return;
+    let type = e.target.value;
+
     if (type === 'distance') {
       this.#workouts = this.#workouts.sort(
         (work1, work2) => work1.distance - work2.distance
@@ -424,6 +430,7 @@ class App {
         (work1, work2) => work1.duration - work2.duration
       );
     }
+    this.updateListDOM();
   }
 
   _deleteWorkout(e) {
@@ -432,9 +439,15 @@ class App {
     if (e.target.className !== 'delete') return;
 
     const workoutEl = e.target.closest('.workout');
+
+    this.#workouts.map(work => {
+      if (work.id === workoutEl.dataset.id) this._removeWorkoutMarker(work);
+    });
+
     this.#workouts = this.#workouts.filter(
       el => el.id !== workoutEl.dataset.id
     );
+
     this.updateListDOM();
     this.removeDeleteBtn(this.#workouts);
     this._setLocalStorage();
