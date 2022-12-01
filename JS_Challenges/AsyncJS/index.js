@@ -191,7 +191,7 @@ console.log('test end');
 });
 
 lotteryPromise.then(resp => console.log(resp)).catch(err => console.error(err));*/
-
+/*
 const getJSON = function (url, errMsg = 'Something went wrong') {
   return fetch(url).then(resp => {
     if (!resp.ok) throw new Error(`${errMsg} ${resp.status}`);
@@ -222,13 +222,14 @@ const getCountryData = function (country) {
       setTimeout(() => (countriesContainer.style.opacity = 1), 10000);
     });
 };
+*/
 
 const getPostion = function () {
   return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(resolve, reject);
   });
 };
-
+/*
 const whereAmI = function () {
   getPostion()
     .then(pos => {
@@ -246,9 +247,59 @@ const whereAmI = function () {
       getCountryData(data.country);
     })
     .catch(err => console.log(err.message));
+};*/
+
+const myLocation = async function () {
+  try {
+    const position = await getPostion();
+
+    const { latitude: lat, longitude: lng } = position.coords;
+
+    const geoResp = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+    console.log(geoResp);
+    if (!geoResp.ok) throw new Error('Problem getting location data');
+    const geoData = await geoResp.json();
+
+    //country data
+
+    const resp = await fetch(
+      `https://restcountries.com/v2/name/${geoData.country}`
+    );
+    if (!resp.ok) throw new Error('Problem getting country data');
+
+    const dataResp = await resp.json();
+
+    //render country
+    renderCountry(dataResp[0]);
+    return `You are in ${geoData.city}, ${geoData.country}`;
+  } catch (err) {
+    console.log(err);
+    renderError(err);
+    //rethrow the error
+
+    throw err;
+  }
 };
 
 // btn.addEventListener('click', whereAmI);
+// btn.addEventListener('click', myLocation);
+// console.log('1: Will getting location');
+// myLocation()
+//   .then(data => console.log(data))
+//   .catch(err => console.error(`2: ${err}`))
+//   .finally(() => console.log('3: Location uploading finished'));
+
+/*(async function () {
+  try {
+    const location = await myLocation();
+    console.log(location);
+  } catch (err) {
+    console.error(`2: ${err}`);
+  } finally {
+    console.log('3: Location uploading finished');
+  }
+})();
+*/
 
 // Coding Challenge #2
 
@@ -267,7 +318,7 @@ PART 2
 TEST DATA: Images in the img folder. Test the error handler by passing a wrong image path. Set the network speed to 'Fast 3G' in the dev tools Network tab, otherwise images load too fast.
 GOOD LUCK 😀
 */
-
+/*
 const wait = function (seconds) {
   return new Promise(function (resolve) {
     setTimeout(resolve, seconds * 1000);
@@ -308,3 +359,43 @@ createImage('img/img-1.jpg')
     currentImg.style.display = 'none';
   })
   .catch(err => console.log(err));
+*/
+
+//                      /////////// runing promises in paralel
+
+const getJSON = function (url, errMsg = 'Something went wrong') {
+  return fetch(url).then(resp => {
+    if (!resp.ok) throw new Error(`${errMsg} ${resp.status}`);
+    return resp.json();
+  });
+};
+
+const getThreeCountries = async function (c1, c2, c3) {
+  try {
+    const data = await Promise.any([
+      getJSON(`https://restcountries.com/v2/name/${c1}`),
+      getJSON(`https://restcountries.com/v2/name/${c2}`),
+      getJSON(`https://restcountries.com/v2/name/${c3}`),
+    ]);
+    console.log(data);
+
+    data.map(c => console.log(c[0].capital));
+  } catch (err) {
+    console.log(err.message);
+  }
+};
+
+getThreeCountries('ukraine', 'canada', 'usa');
+
+const timeout = function (sec) {
+  return new Promise(function (_, reject) {
+    setTimeout(() => {
+      reject(new Error('request took to long'));
+    }, sec);
+  });
+};
+
+Promise.race([
+  getJSON(`https://restcountries.com/v2/name/canada`),
+  timeout(8900),
+]).then(data => console.log(data));
