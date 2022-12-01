@@ -363,6 +363,8 @@ createImage('img/img-1.jpg')
 
 //                      /////////// runing promises in paralel
 
+/*
+
 const getJSON = function (url, errMsg = 'Something went wrong') {
   return fetch(url).then(resp => {
     if (!resp.ok) throw new Error(`${errMsg} ${resp.status}`);
@@ -407,6 +409,7 @@ Promise.any([
 ])
   .then(resp => console.log(resp))
   .catch(err => console.log(err));
+  */
 
 /* 
 PART 1
@@ -421,3 +424,77 @@ PART 2
 TEST DATA: ['img/img-1.jpg', 'img/img-2.jpg', 'img/img-3.jpg']. To test, turn off the 'loadNPause' function.
 GOOD LUCK 😀
 */
+
+const wait = function (seconds) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+const imgContainer = document.querySelector('.images');
+
+const createImage = function (imgPath) {
+  return new Promise((resolve, reject) => {
+    const image = document.createElement('img');
+    image.setAttribute('src', imgPath);
+
+    image.addEventListener('load', function () {
+      imgContainer.append(image);
+      resolve(image);
+    });
+    image.addEventListener('error', () => {
+      reject(new Error('upsi dypsi'));
+    });
+  });
+};
+// let currentImg;
+
+// createImage('img/img-1.jpg')
+//   .then(resp => {
+//     currentImg = resp;
+//     return wait(2);
+//   })
+//   .then(() => {
+//     currentImg.style.display = 'none';
+//     return createImage('img/img-2.jpg');
+//   })
+//   .then(resp => {
+//     currentImg = resp;
+//     return wait(2);
+//   })
+//   .then(() => {
+//     currentImg.style.display = 'none';
+//   })
+//   .catch(err => console.log(err));
+
+let currentImg;
+
+const loadNPause = async function (s1, s2) {
+  try {
+    const img1 = await createImage(s1);
+    currentImg = img1;
+    await wait(2);
+    currentImg.style.display = 'none';
+    const img2 = await createImage(s2);
+    currentImg = img2;
+    await wait(2);
+    currentImg.style.display = 'none';
+  } catch (err) {
+    console.log(`this is Error ${err.message}`);
+  }
+};
+
+loadNPause('img/img-1.jpg', 'img/img-2.jpg');
+
+const loadAll = async function (imgArr) {
+  try {
+    const imgs = imgArr.map(async src => await createImage(src));
+    let images = await Promise.all(imgs);
+
+    images.forEach(el => el.classList.add('parallel'));
+  } catch (err) {
+    console.log(`this is bad error ${err.message}`);
+  }
+};
+
+loadAll(['img/img-1.jpg', 'img/img-2.jpg', 'img/img-3.jpg']);
