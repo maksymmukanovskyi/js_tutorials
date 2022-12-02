@@ -37,6 +37,7 @@ class App {
     containerWorkouts.addEventListener('click', this._deleteWorkout.bind(this));
     sidebar.addEventListener('click', this._deleteAllWorkouts.bind(this));
     sidebar.addEventListener('change', this._sortList.bind(this));
+    window.addEventListener('load', this._renderModal);
   }
   //users current position
   _getPosition() {
@@ -194,6 +195,23 @@ class App {
 
     // v {lat: 47.0144714, lng: 28.8238713}
     this.#map.removeLayer(currentMarker[0]);
+  }
+
+  _renderModal() {
+    let html = `<div class="modal-container" id="modal-opened">
+    <div class="modal">
+      <div class="modal__details">
+        <h1 class="modal__title">Modal Title</h1>
+        <p class="modal__description">Sentence that will tell user what this modal is for or something.</p>
+      </div>
+      <p class="modal__text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis ex dicta maiores libero minus obcaecati iste optio, eius labore repellendus.</p>
+      <button class="modal__btn">Button &rarr;</button>
+  
+      <a href="#modal-closed" class="link-2"></a>
+  
+    </div>
+  </div>`;
+    document.body.insertAdjacentHTML('afterbegin', html);
   }
 
   _renderWorkout(workout) {
