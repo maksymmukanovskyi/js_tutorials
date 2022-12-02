@@ -37,7 +37,7 @@ class App {
     containerWorkouts.addEventListener('click', this._deleteWorkout.bind(this));
     sidebar.addEventListener('click', this._deleteAllWorkouts.bind(this));
     sidebar.addEventListener('change', this._sortList.bind(this));
-    window.addEventListener('load', this._renderModal);
+    // window.addEventListener('load', this._renderModal);
   }
   //users current position
   _getPosition() {
@@ -197,21 +197,22 @@ class App {
     this.#map.removeLayer(currentMarker[0]);
   }
 
-  _renderModal() {
+  _renderModal(action) {
     let html = `<div class="modal-container" id="modal-opened">
     <div class="modal">
       <div class="modal__details">
-        <h1 class="modal__title">Modal Title</h1>
-        <p class="modal__description">Sentence that will tell user what this modal is for or something.</p>
+        <h1 class="modal__title">You are about to submit ${action}</h1>
       </div>
-      <p class="modal__text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis ex dicta maiores libero minus obcaecati iste optio, eius labore repellendus.</p>
-      <button class="modal__btn">Button &rarr;</button>
-  
-      <a href="#modal-closed" class="link-2"></a>
-  
+      
+      <button class="modal__btn abbort">Abbort</button>
+      <button class="modal__btn confirm">Confirm</button>
     </div>
   </div>`;
     document.body.insertAdjacentHTML('afterbegin', html);
+  }
+
+  _removeModal() {
+    document.querySelector('.modal-container').remove();
   }
 
   _renderWorkout(workout) {
@@ -273,6 +274,8 @@ class App {
       <option value="time">time</option>
     </select>`;
     let btn;
+    // let selector = document.querySelector('.filter__input');
+    // selector.addEventListener('change', this._sortList.bind(this));
 
     if (arr.length >= 2) {
       btn = document.querySelector('.delete__all');
@@ -280,7 +283,9 @@ class App {
       containerWorkouts.insertAdjacentHTML('afterend', html);
     }
 
-    if (arr.length === 0 && btn) containerWorkouts.removeChild(btn);
+    if (arr.length === 0 && btn) {
+      containerWorkouts.removeChild(btn);
+    }
   }
 
   removeDeleteBtn(arr) {
@@ -362,79 +367,96 @@ class App {
       inputs.every(inp => Number.isFinite(inp));
     const allPositive = (...inputs) => inputs.every(inp => inp > 0);
 
-    //get data from form
-    const type = inputType.value;
-    const duration = +inputDuration.value;
-    const distance = +inputDistance.value;
-    const [lat, lng] = this.#mapEvent;
+    this._renderModal(' new edit');
 
-    let workout;
+    const handleConfirm = () => {
+      //get data from form
+      const type = inputType.value;
+      const duration = +inputDuration.value;
+      const distance = +inputDistance.value;
+      const [lat, lng] = this.#mapEvent;
 
-    //if workout running create running obj
-    if (type === 'running') {
-      const cadence = +inputCadence.value;
-      //check if data is valid
-      if (
-        !validInputs(duration, distance, cadence) ||
-        !allPositive(duration, distance, cadence)
-      )
-        return alert('input has to be a positive number!');
+      let workout;
 
-      // workout = new Running(distance, duration, [lat, lng], cadence);
-      //add new obj to workout array
+      //if workout running create running obj
+      if (type === 'running') {
+        const cadence = +inputCadence.value;
+        //check if data is valid
+        if (
+          !validInputs(duration, distance, cadence) ||
+          !allPositive(duration, distance, cadence)
+        )
+          return alert('input has to be a positive number!');
 
-      this.#workouts = this.#workouts.map(workEl => {
-        let workObj;
-        if (workEl.id === this.#idUnderEdit) {
-          workObj = {
-            ...workEl,
-            distance: distance,
-            duration: duration,
-            coords: [lat, lng],
-            cadence: cadence,
-            pace: duration / distance,
-          };
-        } else {
-          workObj = workEl;
-        }
-        return workObj;
-      });
-    }
+        // workout = new Running(distance, duration, [lat, lng], cadence);
+        //add new obj to workout array
 
-    //if workout cycling create cycling obj
-    if (type === 'cycling') {
-      const elevation = +inputElevation.value;
-      if (
-        !validInputs(duration, distance, elevation) ||
-        !allPositive(duration, distance)
-      )
-        return alert('input has to be a positive number!');
-      this.#workouts = this.#workouts.map(workEl => {
-        let workObj;
-        if (workEl.id === this.#idUnderEdit) {
-          workObj = {
-            ...workEl,
-            distance: distance,
-            duration: duration,
-            coords: [lat, lng],
-            elevationGain: elevation,
-            pace: duration / distance,
-            speed: distance / (duration / 60),
-          };
-        } else {
-          workObj = workEl;
-        }
-        return workObj;
-      });
-    }
+        this.#workouts = this.#workouts.map(workEl => {
+          let workObj;
+          if (workEl.id === this.#idUnderEdit) {
+            workObj = {
+              ...workEl,
+              distance: distance,
+              duration: duration,
+              coords: [lat, lng],
+              cadence: cadence,
+              pace: duration / distance,
+            };
+          } else {
+            workObj = workEl;
+          }
+          return workObj;
+        });
+      }
 
-    this.updateListDOM();
+      //if workout cycling create cycling obj
+      if (type === 'cycling') {
+        const elevation = +inputElevation.value;
+        if (
+          !validInputs(duration, distance, elevation) ||
+          !allPositive(duration, distance)
+        )
+          return alert('input has to be a positive number!');
+        this.#workouts = this.#workouts.map(workEl => {
+          let workObj;
+          if (workEl.id === this.#idUnderEdit) {
+            workObj = {
+              ...workEl,
+              distance: distance,
+              duration: duration,
+              coords: [lat, lng],
+              elevationGain: elevation,
+              pace: duration / distance,
+              speed: distance / (duration / 60),
+            };
+          } else {
+            workObj = workEl;
+          }
+          return workObj;
+        });
+      }
 
-    this.underEdit = false;
+      this.updateListDOM();
 
-    this._hideForm();
-    //set local storage to all workouts
-    this._setLocalStorage();
+      this.underEdit = false;
+
+      this._hideForm();
+      //set local storage to all workouts
+      this._setLocalStorage();
+      this._removeModal();
+    };
+
+    const handleAbbort = () => {
+      this.underEdit = false;
+      this.updateListDOM();
+
+      this._hideForm();
+      this._removeModal();
+    };
+
+    document.querySelector('.abbort').addEventListener('click', handleAbbort);
+
+    document.querySelector('.confirm').addEventListener('click', handleConfirm);
   }
 
   updateListDOM() {
@@ -444,21 +466,25 @@ class App {
   }
 
   _sortList(e) {
+    console.log(e.target.className);
     if (e.target.value === '') return;
-    let type = e.target.value;
 
-    if (type === 'distance') {
-      this.#workouts = this.#workouts.sort(
-        (work1, work2) => work1.distance - work2.distance
-      );
-    }
+    if (e.target.className === 'filter__input') {
+      let type = e.target.value;
 
-    if (type === 'time') {
-      this.#workouts = this.#workouts.sort(
-        (work1, work2) => work1.duration - work2.duration
-      );
+      if (type === 'distance') {
+        this.#workouts = this.#workouts.sort(
+          (work1, work2) => work1.distance - work2.distance
+        );
+      }
+
+      if (type === 'time') {
+        this.#workouts = this.#workouts.sort(
+          (work1, work2) => work1.duration - work2.duration
+        );
+      }
+      this.updateListDOM();
     }
-    this.updateListDOM();
   }
 
   _deleteWorkout(e) {
@@ -466,28 +492,54 @@ class App {
 
     if (e.target.className !== 'delete') return;
 
-    const workoutEl = e.target.closest('.workout');
+    this._renderModal('delete workout');
 
-    this.#workouts.map(work => {
-      if (work.id === workoutEl.dataset.id) this._removeWorkoutMarker(work);
-    });
+    const handleAbbort = () => {
+      this.updateListDOM();
+      this.removeDeleteBtn(this.#workouts);
+      this._setLocalStorage();
+      this._removeModal();
+    };
 
-    this.#workouts = this.#workouts.filter(
-      el => el.id !== workoutEl.dataset.id
-    );
+    const handleConfirm = () => {
+      const workoutEl = e.target.closest('.workout');
 
-    this.updateListDOM();
-    this.removeDeleteBtn(this.#workouts);
-    this._setLocalStorage();
+      this.#workouts.map(work => {
+        if (work.id === workoutEl.dataset.id) this._removeWorkoutMarker(work);
+      });
+
+      this.#workouts = this.#workouts.filter(
+        el => el.id !== workoutEl.dataset.id
+      );
+
+      this.updateListDOM();
+      this.removeDeleteBtn(this.#workouts);
+      this._setLocalStorage();
+      this._removeModal();
+    };
+    document.querySelector('.abbort').addEventListener('click', handleAbbort);
+
+    document.querySelector('.confirm').addEventListener('click', handleConfirm);
   }
 
   _deleteAllWorkouts(e) {
     e.preventDefault();
     if (e.target.className !== 'delete__all') return;
-    this.#workouts = [];
-    this.reset();
-    this.updateListDOM();
-    this._renderDeleteAllBtn(this.#workouts);
+    this._renderModal('delete all workouts');
+    const handleAbbort = () => {
+      this._removeModal();
+    };
+    const handleConfirm = () => {
+      this.#workouts = [];
+      this.reset();
+      this.updateListDOM();
+      this._renderDeleteAllBtn(this.#workouts);
+      this._removeModal();
+    };
+
+    document.querySelector('.abbort').addEventListener('click', handleAbbort);
+
+    document.querySelector('.confirm').addEventListener('click', handleConfirm);
   }
 
   _setLocalStorage() {
