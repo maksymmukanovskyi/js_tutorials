@@ -1,5 +1,5 @@
 import addToCard, { cart } from './shoppingCard.js';
-import cloneDeep from 'lodash';
+import x from './test.js';
 console.log(cart);
 
 console.log('importing module');
@@ -14,6 +14,4 @@ const matt = {
   ann: 23,
 };
 
-const newMatt = cloneDeep(matt);
-
-console.log(newMatt);
+console.log('imported num', x);
