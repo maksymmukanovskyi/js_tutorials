@@ -8,8 +8,5 @@
     "build": "parcel build index.html"
   },
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "leaflet": "^1.9.3"
-  }
+  "license": "ISC"
 }
