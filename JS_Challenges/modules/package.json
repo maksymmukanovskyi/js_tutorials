@@ -11,10 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "leaflet": "^1.9.3",
-    "lodash": "^4.17.21",
-    "parcel": "^2.8.0"
-  },
-  "devDependencies": {
-    "parsel": "^0.3.0"
+    "lodash": "^4.17.21"
   }
 }

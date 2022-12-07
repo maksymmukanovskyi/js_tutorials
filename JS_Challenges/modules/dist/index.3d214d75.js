@@ -557,7 +557,7 @@ const matt = {
 const newMatt = (0, _lodashDefault.default)(matt);
 console.log(newMatt);
 
-},{"./shoppingCard.js":"68uLS","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","lodash":"3qBDj"}],"68uLS":[function(require,module,exports) {
+},{"./shoppingCard.js":"68uLS","lodash":"3qBDj","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"68uLS":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "cart", ()=>cart);
