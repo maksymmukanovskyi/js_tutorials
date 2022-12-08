@@ -1,6 +1,5 @@
 console.log('Exporting module');
 
-const shippingCost = 10;
 export const cart = [];
 
 export default function (product, quantity) {

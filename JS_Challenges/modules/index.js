@@ -15,3 +15,4 @@ const matt = {
 };
 
 console.log('imported num', x);
+console.log(`i imported ${x} from test js`);
