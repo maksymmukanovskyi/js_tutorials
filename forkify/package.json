@@ -35,7 +35,10 @@
     "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
-    "babel-polyfill": "^6.26.0"
+    "babel-polyfill": "^6.26.0",
+    "core-js": "^3.26.1",
+    "fractional": "^1.0.0",
+    "regenerator-runtime": "^0.13.11"
   },
   "bugs": {
     "url": "https://github.com/maksymmukanovskyi/js_tutorials/issues"
