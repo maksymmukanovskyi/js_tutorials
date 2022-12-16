@@ -6,6 +6,7 @@ import '../sass/main.scss';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import { async } from 'regenerator-runtime';
+if (module && module.hot) module.hot.accept();
 
 // import { forEach } from 'core-js/core/array';
 
