@@ -7,6 +7,7 @@ import '../sass/main.scss';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import { async } from 'regenerator-runtime';
+import recipeView from './views/recipeView';
 // if (module && module.hot) module.hot.accept();
 
 // import { forEach } from 'core-js/core/array';
@@ -16,6 +17,7 @@ import { async } from 'regenerator-runtime';
 const controlRecipe = async function () {
   try {
     const id = window.location.hash.slice(3);
+    console.log(id);
 
     if (!id) return;
 
@@ -29,6 +31,8 @@ const controlRecipe = async function () {
     // const recipe = model.state.recipe;
 
     RecipeView.render(model.state.recipe);
+
+    ctrlServings();
   } catch (error) {
     RecipeView.renderError();
   }
@@ -59,6 +63,13 @@ const ctrlPagination = function (goToPage) {
 
   //2. render NEW pagination buttons
   paginationView.render(model.state.search);
+};
+
+const ctrlServings = function () {
+  // Update recipe servings (in state)
+  model.updateServings(8);
+  // Updating recipe view
+  RecipeView.render(model.state.recipe);
 };
 
 const init = function () {
