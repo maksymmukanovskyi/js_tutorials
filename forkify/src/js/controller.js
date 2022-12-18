@@ -19,7 +19,8 @@ const controlRecipe = async function () {
     const id = window.location.hash.slice(1);
 
     if (!id) return;
-
+    // 0.  Update results view to mark selected search result.
+    resultsView.update(model.getSearchResultsPage());
     //1. Loading recipe
 
     RecipeView.renderSpinner();
@@ -30,8 +31,6 @@ const controlRecipe = async function () {
     // const recipe = model.state.recipe;
 
     RecipeView.render(model.state.recipe);
-
-    ctrlServings();
   } catch (error) {
     RecipeView.renderError();
   }
@@ -64,16 +63,18 @@ const ctrlPagination = function (goToPage) {
   paginationView.render(model.state.search);
 };
 
-const ctrlServings = function () {
+const ctrlServings = function (newServings) {
   // Update recipe servings (in state)
-  model.updateServings(8);
+  model.updateServings(newServings);
   // Updating recipe view
-  RecipeView.render(model.state.recipe);
+  // RecipeView.render(model.state.recipe);
+  RecipeView.update(model.state.recipe);
 };
 
 const init = function () {
   paginationView.addHandlerClick(ctrlPagination);
   RecipeView.addHandlerRednder(controlRecipe);
+  RecipeView.addHandlerUpdateServings(ctrlServings);
   searchView.addHandlerSearch(ctrlSearchResults);
 };
 init();
