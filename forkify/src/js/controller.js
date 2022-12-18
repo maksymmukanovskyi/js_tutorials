@@ -16,8 +16,7 @@ import recipeView from './views/recipeView';
 
 const controlRecipe = async function () {
   try {
-    const id = window.location.hash.slice(3);
-    console.log(id);
+    const id = window.location.hash.slice(1);
 
     if (!id) return;
 

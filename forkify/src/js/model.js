@@ -14,8 +14,6 @@ export const state = {
 
 export const loadRecipe = async function (id) {
   try {
-    //5ed6604591c37cdc054bcd09
-    console.log(`${API_URL}${id}`);
     const data = await getJSON(`${API_URL}${id}`);
 
     const { recipe } = data.data;
