@@ -1,5 +1,5 @@
 const path = require('path');
-const webpack = require('webpack');
+// const webpack = require('webpack');
 const HtmlWebPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
@@ -14,7 +14,7 @@ module.exports = {
     static: {
       directory: path.join(__dirname, './dist'),
     },
-    hot: true,
+    // hot: true,
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
