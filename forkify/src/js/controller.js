@@ -73,8 +73,8 @@ const ctrlServings = function (newServings) {
 
 const controlAddBookmark = function () {
   if (!model.state.recipe.bookmarked) model.addBookmark(model.state.recipe);
-  else model.state.recipe.bookmarked;
-  model.deleteBookmark(model.state.recipe.id);
+  else if (model.state.recipe.bookmarked)
+    model.deleteBookmark(model.state.recipe.id);
 
   recipeView.update(model.state.recipe);
 };
