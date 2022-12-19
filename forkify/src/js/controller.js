@@ -3,11 +3,13 @@ import RecipeView from './views/recipeView';
 import searchView from './views/searchView';
 import resultsView from './views/resultsView';
 import paginationView from './views/paginationView';
+import recipeView from './views/recipeView';
+import bookmarksView from './views/bookmarksView';
+
 import '../sass/main.scss';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import { async } from 'regenerator-runtime';
-import recipeView from './views/recipeView';
 // if (module && module.hot) module.hot.accept();
 
 // import { forEach } from 'core-js/core/array';
@@ -21,6 +23,7 @@ const controlRecipe = async function () {
     if (!id) return;
     // 0.  Update results view to mark selected search result.
     resultsView.update(model.getSearchResultsPage());
+    bookmarksView.update(model.state.bookMarks);
     //1. Loading recipe
 
     RecipeView.renderSpinner();
@@ -72,11 +75,14 @@ const ctrlServings = function (newServings) {
 };
 
 const controlAddBookmark = function () {
+  //add/remove bookmark
   if (!model.state.recipe.bookmarked) model.addBookmark(model.state.recipe);
-  else if (model.state.recipe.bookmarked)
-    model.deleteBookmark(model.state.recipe.id);
-
+  else model.deleteBookmark(model.state.recipe.id);
+  // update recipe view
   recipeView.update(model.state.recipe);
+
+  // render bookmark
+  bookmarksView.render(model.state.bookMarks);
 };
 
 const init = function () {
