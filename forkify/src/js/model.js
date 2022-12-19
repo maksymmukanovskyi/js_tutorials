@@ -1,6 +1,7 @@
 import { async } from 'regenerator-runtime';
 import { API_URL, RES_PER_PAGE } from './config';
 import { getJSON } from './helpers';
+import recipeView from './views/recipeView';
 
 export const state = {
   recipe: {},
@@ -10,6 +11,7 @@ export const state = {
     page: 1,
     resultsPerPage: RES_PER_PAGE,
   },
+  bookMarks: [],
 };
 
 export const loadRecipe = async function (id) {
@@ -27,6 +29,10 @@ export const loadRecipe = async function (id) {
       cookingTime: recipe.cooking_time,
       ingredients: recipe.ingredients,
     };
+
+    if (state.bookMarks.some(bookmark => bookmark.id === id))
+      state.recipe.bookmarked = true;
+    else state.recipe.bookmarked = false;
   } catch (err) {
     throw err;
   }
@@ -65,4 +71,22 @@ export const updateServings = function (newServings) {
     // newQt = oldQt * newServings / oldServings
   });
   state.recipe.servings = newServings;
+};
+
+export const addBookmark = function (recipe) {
+  //Add bookmark
+  this.state.bookMarks.push(recipe);
+
+  //Mark current recipe as bookmarked
+
+  if (recipe.id === state.recipe.id) state.recipe.bookmarked = true;
+};
+
+export const deleteBookmark = function (id) {
+  // Delete bookmark
+  const index = state.bookMarks.findIndex(el => el.id === id);
+  state.bookMarks.splice(index, 1);
+
+  //Mark current recipe as NOT bookmarked
+  if (id === state.recipe.id) state.recipe.bookmarked = false;
 };
