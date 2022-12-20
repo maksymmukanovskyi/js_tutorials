@@ -23,6 +23,7 @@ const controlRecipe = async function () {
     if (!id) return;
     // 0.  Update results view to mark selected search result.
     resultsView.update(model.getSearchResultsPage());
+
     bookmarksView.update(model.state.bookMarks);
     //1. Loading recipe
 
@@ -85,7 +86,12 @@ const controlAddBookmark = function () {
   bookmarksView.render(model.state.bookMarks);
 };
 
+const controlBookmarks = function () {
+  bookmarksView.render(model.state.bookMarks);
+};
+
 const init = function () {
+  bookmarksView.addHandlerRender(controlBookmarks);
   paginationView.addHandlerClick(ctrlPagination);
   RecipeView.addHandlerRednder(controlRecipe);
   RecipeView.addHandlerUpdateServings(ctrlServings);
