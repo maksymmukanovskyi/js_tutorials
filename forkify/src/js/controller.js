@@ -101,12 +101,12 @@ const controlAddRecipe = async function (newRecipe) {
 
     await model.uploadRecipe(newRecipe);
 
+    //Success message
+    addRecipeView.renderMessageOnSucces();
+
     //Render recipe
 
     recipeView.render(model.state.recipe);
-
-    //Success message
-    addRecipeView.renderMessageOnSucces();
 
     //Render bookmark view
     bookmarksView.render(model.state.bookMarks);
